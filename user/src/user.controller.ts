@@ -1,11 +1,11 @@
 import { Controller, HttpStatus, Inject } from '@nestjs/common';
-import { MessagePattern, ClientProxy } from '@nestjs/microservices';
-
-import { UserService } from './services/user.service';
-import { IUser } from './interfaces/user.interface';
+import { ClientProxy, MessagePattern } from '@nestjs/microservices';
+import { IUserConfirmResponse } from './interfaces/user-confirm-response.interface';
 import { IUserCreateResponse } from './interfaces/user-create-response.interface';
 import { IUserSearchResponse } from './interfaces/user-search-response.interface';
-import { IUserConfirmResponse } from './interfaces/user-confirm-response.interface';
+import { IUser } from './interfaces/user.interface';
+import { UserService } from './services/user.service';
+
 
 @Controller('user')
 export class UserController {
@@ -131,6 +131,7 @@ export class UserController {
   @MessagePattern('user_create')
   public async createUser(userParams: IUser): Promise<IUserCreateResponse> {
     let result: IUserCreateResponse;
+    console.log('recu')
 
     if (userParams) {
       const usersWithEmail = await this.userService.searchUser({
@@ -164,7 +165,7 @@ export class UserController {
             errors: null,
           };
           this.mailerServiceClient
-            .send('mail_send', {
+            .send({cmd: 'mail_send'}, {
               to: createdUser.email,
               subject: 'Email confirmation',
               html: `<center>
